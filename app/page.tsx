@@ -1,103 +1,170 @@
-import Image from "next/image";
+"use client"
+
+import * as React from "react"
+import { Button } from "@/components/ui/button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useAuthCallback } from "@/hooks/use-auth-callback"
+import { useAuth } from "@/hooks/use-auth"
+import { useConversation, useChat } from "@/hooks/use-chat"
+import { useConversationContext } from "@/components/providers/conversation-provider"
+import { categories } from "@/lib/categories"
+import { aiModels } from "@/lib/aimodels"
+import { MessageList } from "@/components/chat/message-list"
+import { Brain } from "lucide-react"
+
+const sampleQuestions = [
+  "How does AI work?",
+  "Are black holes real?",
+  'How many Rs are in the word "strawberry"?',
+  "What is the meaning of life?",
+]
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  // Handle OAuth callback and refresh auth state
+  useAuthCallback()
+  
+  const { isAuthenticated } = useAuth()
+  const { createConversation, isCreatingConversation } = useChat()
+  const { selectedConversationId, setSelectedConversationId, isSendingMessage } = useConversationContext()
+  
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const { 
+    data: conversation, 
+    isLoading: isLoadingConversation 
+  } = useConversation(selectedConversationId)
+
+  const handleQuestionClick = async (question: string) => {
+    if (!isAuthenticated) return
+    
+    // Create a new conversation with the first AI model and the question
+    createConversation({
+      modelName: aiModels[0].name,
+      modelProvider: aiModels[0].provider,
+      title: question.slice(0, 50) + (question.length > 50 ? '...' : ''),
+    }, {
+      onSuccess: (newConversation) => {
+        setSelectedConversationId(newConversation.id)
+        // The footer will handle sending the actual message
+      }
+    })
+  }
+
+
+
+    // If user has selected a conversation, show the chat interface
+  if (selectedConversationId && conversation) {
+    return (
+      <div className="flex flex-col h-full">
+        {/* Chat Header */}
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div>
+                <h2 className="font-semibold text-gray-900 dark:text-white">
+                  {conversation.title}
+                </h2>
+              </div>
+            </div>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedConversationId(null)}
+              className="text-green-600 border-green-200 hover:bg-green-50"
+            >
+              New Chat
+            </Button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Messages Area */}
+        <ScrollArea className="flex-1 px-6">
+          <div className="py-6">
+            {isLoadingConversation ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-gray-500">Loading conversation...</span>
+                </div>
+              </div>
+            ) : conversation.messages?.length === 0 && !isSendingMessage ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mb-4">
+                  <Brain className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Start a conversation with {conversation.model_name}
+                </p>
+              </div>
+            ) : (
+              <MessageList 
+                messages={conversation.messages || []}
+                isLoading={isCreatingConversation || isSendingMessage}
+              />
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    )
+  }
+
+    // Default welcome screen
+  return (
+    <div className="flex-1 flex flex-col items-center justify-center p-8">
+      <div className="max-w-2xl w-full space-y-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-semibold text-green-900 dark:text-white mb-8">
+            How can I help you?
+          </h1>
+
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {categories.map((category) => (
+              <Button
+                key={category.name}
+                variant="outline"
+                className={`${category.color} border-green-200 dark:border-slate-700`}
+                onClick={() => {
+                  if (isAuthenticated) {
+                    // Could implement category-based conversation creation
+                  }
+                }}
+              >
+                <category.icon className="w-4 h-4 mr-2" />
+                {category.name}
+              </Button>
+            ))}
+          </div>
+
+          <div className="space-y-3 mb-16">
+            {sampleQuestions.map((question, index) => (
+              <Button
+                key={index}
+                variant="ghost"
+                disabled={!isAuthenticated || isCreatingConversation}
+                onClick={() => handleQuestionClick(question)}
+                className="w-full text-left justify-start text-green-800 dark:text-white hover:bg-green-100 dark:hover:bg-slate-800 h-auto py-3 px-4 disabled:opacity-50"
+              >
+                {isCreatingConversation ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin mr-2" />
+                    Creating conversation...
+                  </div>
+                ) : (
+                  question
+                )}
+              </Button>
+            ))}
+          </div>
+
+          {!isAuthenticated && (
+            <div className="text-center py-4">
+              <p className="text-gray-500 text-sm">
+                Please sign in to start chatting with AI models
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
-  );
+  )
 }
