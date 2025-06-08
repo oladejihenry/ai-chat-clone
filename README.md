@@ -30,10 +30,9 @@ A modern, multi-model AI chat platform built with **Next.js 15**, **Laravel**, a
 
 ### Backend
 
-- **Laravel 11** API
+- **Laravel 12** API
 - **Laravel Sanctum** for authentication
-- **MySQL/PostgreSQL** database
-- **Queue system** for background processing
+- **PostgreSQL** database
 
 ## 🚀 Quick Start
 
@@ -41,7 +40,7 @@ A modern, multi-model AI chat platform built with **Next.js 15**, **Laravel**, a
 
 - **Node.js** 18+ and **pnpm**
 - **PHP** 8.2+ and **Composer**
-- **MySQL** or **PostgreSQL**
+- **PostgreSQL**
 - AI model API keys (see [AI Model Setup](#-ai-model-setup))
 
 ### Frontend Installation
@@ -423,4 +422,4 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-**Built with ❤️ by the AI.chat team**
+**Built with ❤️ by the Henry**
