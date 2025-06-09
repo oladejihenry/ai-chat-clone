@@ -26,8 +26,8 @@ import { cn } from '@/lib/utils'
 import { ScrollArea } from '../ui/scroll-area'
 
 interface ConversationListProps {
-  selectedConversationId?: number | null
-  onConversationSelect: (conversationId: number) => void
+  selectedConversationId?: string | null
+  onConversationSelect: (conversationId: string) => void
   onNewConversation: () => void
 }
 
@@ -36,7 +36,7 @@ export function ConversationList({
   onConversationSelect,
   onNewConversation 
 }: ConversationListProps) {
-  const [editingId, setEditingId] = useState<number | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [editingTitle, setEditingTitle] = useState('')
   
   const { isAuthenticated } = useAuth()
@@ -61,7 +61,7 @@ export function ConversationList({
     setEditingTitle('')
   }
   
-  const handleDelete = (conversationId: number) => {
+  const handleDelete = (conversationId: string) => {
     deleteConversation(conversationId)
   }
   

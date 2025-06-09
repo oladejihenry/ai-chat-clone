@@ -23,14 +23,34 @@ export function useConversations() {
   })
 }
 
-export function useConversation(id: number | null) {
+export function useConversation(id: string | null) {
   const { isAuthenticated } = useAuth()
   
   return useQuery({
     queryKey: ['conversation', id],
-    queryFn: () => getConversation(id!),
+    queryFn: () => {
+      if (!id) throw new Error('No conversation ID provided')
+      return getConversation(id)
+    },
     enabled: isAuthenticated && !!id,
     staleTime: 30 * 1000, // 30 seconds
+    retry: (failureCount, error) => {
+      // Don't retry 404 errors - conversation doesn't exist
+      if (error.message.includes('404') || error.message.includes('Not Found')) {
+        return false
+      }
+      // Don't retry if conversation ID is invalid
+      if (error.message.includes('No conversation ID provided')) {
+        return false
+      }
+      // Retry other errors up to 3 times
+      return failureCount < 3
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    // Add error handling to prevent background refetches
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: false,
   })
 }
 
@@ -75,7 +95,7 @@ export function useSendMessage() {
       modelName,
       modelProvider,
     }: {
-      conversationId: number
+      conversationId: string
       content: string
       modelName?: string
       modelProvider?: string
@@ -95,7 +115,7 @@ export function useSendMessage() {
         if (!old) return old
         
         const optimisticUserMessage: Message = {
-          id: optimisticId as unknown as number, // Temporary ID
+          id: optimisticId, // Temporary ID
           conversation_id: conversationId,
           content,
           role: 'user',
@@ -164,10 +184,18 @@ export function useDeleteConversation() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: deleteConversation,
+    mutationFn: async (conversationId: string) => {
+      // Cancel and remove all queries for this conversation BEFORE making the API call
+      await queryClient.cancelQueries({ queryKey: ['conversation', conversationId] })
+      queryClient.removeQueries({ queryKey: ['conversation', conversationId] })
+      
+      // Now make the actual delete API call
+      return deleteConversation(conversationId)
+    },
     onMutate: async (conversationId) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['conversations'] })
+      await queryClient.cancelQueries({ queryKey: ['conversation', conversationId] })
       
       // Snapshot the previous value
       const previousConversations = queryClient.getQueryData(['conversations'])
@@ -177,11 +205,16 @@ export function useDeleteConversation() {
         return old?.filter((conv) => conv.id !== conversationId) || []
       })
       
+      // Remove the conversation from cache immediately
+      queryClient.removeQueries({ queryKey: ['conversation', conversationId] })
+      queryClient.setQueryData(['conversation', conversationId], undefined)
+      
       return { previousConversations }
     },
     onSuccess: (_, conversationId) => {
-      // Remove the conversation from cache
+      // Ensure the conversation is completely removed from cache
       queryClient.removeQueries({ queryKey: ['conversation', conversationId] })
+      queryClient.setQueryData(['conversation', conversationId], undefined)
       toast.success('Conversation deleted')
     },
     onError: (error, _, context) => {
@@ -200,7 +233,7 @@ export function useUpdateConversationTitle() {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: ({ id, title }: { id: number; title: string }) =>
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
       updateConversationTitle(id, title),
     onSuccess: (updatedConversation) => {
       // Update the conversation in cache

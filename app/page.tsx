@@ -3,7 +3,6 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useAuthCallback } from "@/hooks/use-auth-callback"
 import { useAuth } from "@/hooks/use-auth"
 import { useConversation } from "@/hooks/use-chat"
 import { useConversationContext } from "@/components/providers/conversation-provider"
@@ -14,20 +13,30 @@ import { Brain } from "lucide-react"
 
 
 export default function Home() {
-  // Handle OAuth callback and refresh auth state
-  useAuthCallback()
   
   const { isAuthenticated, user } = useAuth()
 
-  const { selectedConversationId, setSelectedConversationId, isSendingMessage } = useConversationContext()
+  const { selectedConversationId, setSelectedConversationId, isSendingMessage, clearSelection } = useConversationContext()
 
   const name = user?.data?.name || "Guest"
   
 
   const { 
     data: conversation, 
-    isLoading: isLoadingConversation 
+    isLoading: isLoadingConversation,
+    error: conversationError 
   } = useConversation(selectedConversationId)
+
+  // Clear selected conversation if it doesn't exist (404 error)
+  React.useEffect(() => {
+    if (conversationError && selectedConversationId) {
+      const is404 = conversationError.message.includes('404') || conversationError.message.includes('Not Found')
+      if (is404) {
+        console.log('Selected conversation not found, clearing selection')
+        clearSelection()
+      }
+    }
+  }, [conversationError, selectedConversationId, setSelectedConversationId, clearSelection])
 
 
 
@@ -51,7 +60,7 @@ export default function Home() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedConversationId(null)}
+              onClick={() => clearSelection()}
               className="text-green-600 border-green-200 hover:bg-green-50"
             >
               New Chat

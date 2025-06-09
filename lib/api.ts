@@ -13,8 +13,8 @@ interface User {
 }
 
 interface Message {
-  id: number
-  conversation_id: number
+  id: string
+  conversation_id: string
   content: string
   role: 'user' | 'assistant'
   model_name?: string
@@ -23,7 +23,7 @@ interface Message {
 }
 
 interface Conversation {
-  id: number
+  id: string
   user_id: number
   title: string
   model_name: string
@@ -194,13 +194,13 @@ export async function getConversations(): Promise<Conversation[]> {
   return response.data
 }
 
-export async function getConversation(id: number): Promise<Conversation> {
+export async function getConversation(id: string): Promise<Conversation> {
   const response = await apiRequest<{ data: Conversation }>(`/api/conversations/${id}`)
   return response.data
 }
 
 export async function sendMessage(
-  conversationId: number,
+  conversationId: string,
   content: string,
   modelName?: string,
   modelProvider?: string
@@ -235,14 +235,14 @@ export async function sendMessage(
   return response.data
 }
 
-export async function deleteConversation(id: number): Promise<void> {
+export async function deleteConversation(id: string): Promise<void> {
   await apiRequest(`/api/conversations/${id}`, {
     method: 'DELETE',
   })
 }
 
 export async function updateConversationTitle(
-  id: number,
+  id: string,
   title: string
 ): Promise<Conversation> {
   const response = await apiRequest<{ data: Conversation }>(`/api/conversations/${id}`, {

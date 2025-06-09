@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useAuth } from './use-auth'
-import { toast } from 'sonner'
+
 
 export function useAuthCallback() {
   const { refetchUser, user, isAuthenticated } = useAuth()
@@ -12,7 +12,7 @@ export function useAuthCallback() {
   // Show welcome toast when user becomes authenticated
   useEffect(() => {
     if (isAuthenticated && user && !hasShownWelcome.current) {
-      toast.success(`Welcome back, ${user?.data.name}!`)
+      // toast.success(`Welcome back, ${user?.data.name}!`)
       hasShownWelcome.current = true
     }
   }, [isAuthenticated, user])

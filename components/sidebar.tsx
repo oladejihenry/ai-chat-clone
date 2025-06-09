@@ -11,6 +11,7 @@ import {
   Edit,
   Loader2
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,7 @@ import { GoogleLogin } from "./googleLogin"
 import { UserMenu } from "./user-menu"
 import { useAuth } from "@/hooks/use-auth"
 import { useConversations, useChat } from "@/hooks/use-chat"
+import { useQueryClient } from "@tanstack/react-query"
 import { useConversationContext } from "@/components/providers/conversation-provider"
 import { type Conversation } from "@/lib/api"
 import { cn } from "@/lib/utils"
@@ -39,15 +41,17 @@ import { cn } from "@/lib/utils"
 export function SidebarComponent() {
     const [loginOpen, setLoginOpen] = React.useState(false)
     const [mounted, setMounted] = React.useState(false)
-    const [editingId, setEditingId] = useState<number | null>(null)
+    const [editingId, setEditingId] = useState<string | null>(null)
     const [editingTitle, setEditingTitle] = useState('')
     const [searchQuery, setSearchQuery] = useState('')
     
+    const router = useRouter()
     const { theme, setTheme } = useTheme()
     const { isAuthenticated, isLoading } = useAuth()
     const { data: conversations, isLoading: isLoadingConversations } = useConversations()
     const { deleteConversation, updateTitle, isDeletingConversation } = useChat()
-    const { selectedConversationId, setSelectedConversationId, setCurrentConversationModel } = useConversationContext()
+    const { selectedConversationId, setSelectedConversationId, setCurrentConversationModel, clearSelection } = useConversationContext()
+    const queryClient = useQueryClient()
 
     React.useEffect(() => {
         setMounted(true)
@@ -71,7 +75,20 @@ export function SidebarComponent() {
       setEditingTitle('')
     }
     
-    const handleDelete = (conversationId: number) => {
+    const handleDelete = async (conversationId: string) => {
+      // Immediately cancel any ongoing queries for this conversation
+      await queryClient.cancelQueries({ queryKey: ['conversation', conversationId] })
+      queryClient.removeQueries({ queryKey: ['conversation', conversationId] })
+      
+      // If we're deleting the currently selected conversation, clear the selection FIRST
+      if (selectedConversationId === conversationId) {
+        clearSelection()
+        // Small delay to ensure state is updated before navigation
+        await new Promise(resolve => setTimeout(resolve, 50))
+        router.push('/')
+      }
+      
+      // Then delete the conversation
       deleteConversation(conversationId)
     }
 
@@ -177,8 +194,8 @@ export function SidebarComponent() {
                          <Button 
                className="w-full bg-green-600 hover:bg-green-700 text-white"
                onClick={() => {
-                 setSelectedConversationId(null)
-                 setCurrentConversationModel(null)
+                 clearSelection()
+                 router.push('/')
                }}
                disabled={!isAuthenticated}
              >
@@ -236,6 +253,7 @@ export function SidebarComponent() {
                             onClick={() => {
                               setSelectedConversationId(conversation.id)
                               setCurrentConversationModel(`${conversation.model_name}-${conversation.model_provider}`)
+                              router.push(`/chat/${conversation.id}`)
                             }}
                           >
                             <div className="flex items-start space-x-2">
