@@ -282,8 +282,7 @@ export async function logoutUser(): Promise<void> {
       console.error('Logout failed:', response.status, response.statusText, errorData)
       throw new Error(`Failed to logout: ${response.status} ${response.statusText}`)
     }
-    
-    console.log('Logout successful')
+  
   } catch (error) {
     console.error('Error logging out:', error)
     throw error

@@ -115,16 +115,6 @@ export function Footer() {
   return (
     <footer className="p-6 ">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center text-sm text-green-600 dark:text-green-400 mb-4">
-          Make sure you agree to our{" "}
-          <a href="#" className="underline hover:text-green-800 dark:hover:text-green-300">
-            Terms
-          </a>{" "}
-          and our{" "}
-          <a href="#" className="underline hover:text-green-800 dark:hover:text-green-300">
-            Privacy Policy
-          </a>
-        </div>
 
         {uploadedFiles.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">

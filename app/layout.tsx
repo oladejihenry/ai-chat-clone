@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ConversationProvider } from "@/components/providers/conversation-provider";
 import { Toaster } from "sonner";
+import Mobile from "@/components/mobile";
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,7 +30,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
@@ -38,6 +39,7 @@ export default function RootLayout({
                   <div className="flex h-screen w-full bg-green-50/80 dark:bg-slate-950">
                     <SidebarComponent />
                     <SidebarInset className="flex-1 flex flex-col min-h-0">
+                      <Mobile />
                       <div className="flex-1 overflow-hidden">
                         {children}
                       </div>

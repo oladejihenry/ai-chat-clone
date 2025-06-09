@@ -5,27 +5,23 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuthCallback } from "@/hooks/use-auth-callback"
 import { useAuth } from "@/hooks/use-auth"
-import { useConversation, useChat } from "@/hooks/use-chat"
+import { useConversation } from "@/hooks/use-chat"
 import { useConversationContext } from "@/components/providers/conversation-provider"
 import { categories } from "@/lib/categories"
-import { aiModels } from "@/lib/aimodels"
 import { MessageList } from "@/components/chat/message-list"
 import { Brain } from "lucide-react"
 
-const sampleQuestions = [
-  "How does AI work?",
-  "Are black holes real?",
-  'How many Rs are in the word "strawberry"?',
-  "What is the meaning of life?",
-]
+
 
 export default function Home() {
   // Handle OAuth callback and refresh auth state
   useAuthCallback()
   
-  const { isAuthenticated } = useAuth()
-  const { createConversation, isCreatingConversation } = useChat()
+  const { isAuthenticated, user } = useAuth()
+
   const { selectedConversationId, setSelectedConversationId, isSendingMessage } = useConversationContext()
+
+  const name = user?.data?.name || "Guest"
   
 
   const { 
@@ -33,21 +29,7 @@ export default function Home() {
     isLoading: isLoadingConversation 
   } = useConversation(selectedConversationId)
 
-  const handleQuestionClick = async (question: string) => {
-    if (!isAuthenticated) return
-    
-    // Create a new conversation with the first AI model and the question
-    createConversation({
-      modelName: aiModels[0].name,
-      modelProvider: aiModels[0].provider,
-      title: question.slice(0, 50) + (question.length > 50 ? '...' : ''),
-    }, {
-      onSuccess: (newConversation) => {
-        setSelectedConversationId(newConversation.id)
-        // The footer will handle sending the actual message
-      }
-    })
-  }
+
 
 
 
@@ -99,7 +81,7 @@ export default function Home() {
             ) : (
               <MessageList 
                 messages={conversation.messages || []}
-                isLoading={isCreatingConversation || isSendingMessage}
+                isLoading={isSendingMessage}
               />
             )}
           </div>
@@ -114,7 +96,7 @@ export default function Home() {
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-semibold text-green-900 dark:text-white mb-8">
-            How can I help you?
+            How can I help you, <span className="capitalize">{name}</span>?
           </h1>
 
           <div className="flex flex-wrap justify-center gap-3 mb-12">
@@ -136,24 +118,7 @@ export default function Home() {
           </div>
 
           <div className="space-y-3 mb-16">
-            {sampleQuestions.map((question, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                disabled={!isAuthenticated || isCreatingConversation}
-                onClick={() => handleQuestionClick(question)}
-                className="w-full text-left justify-start text-green-800 dark:text-white hover:bg-green-100 dark:hover:bg-slate-800 h-auto py-3 px-4 disabled:opacity-50"
-              >
-                {isCreatingConversation ? (
-                  <div className="flex items-center">
-                    <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin mr-2" />
-                    Creating conversation...
-                  </div>
-                ) : (
-                  question
-                )}
-              </Button>
-            ))}
+            <h1>Welcome to AI.chat, enter your question below to start chatting with AI models</h1>
           </div>
 
           {!isAuthenticated && (

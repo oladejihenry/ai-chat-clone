@@ -151,3 +151,27 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Message content overflow handling */
+@layer components {
+  .prose {
+    @apply overflow-hidden;
+  }
+  
+  .prose pre {
+    @apply overflow-x-auto max-w-full;
+  }
+  
+  .prose code {
+    @apply break-words;
+  }
+  
+  .prose table {
+    @apply w-full overflow-x-auto block whitespace-nowrap;
+  }
+  
+  .prose img,
+  .prose video {
+    @apply max-w-full h-auto;
+  }
+}
