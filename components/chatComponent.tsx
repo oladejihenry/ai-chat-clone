@@ -116,23 +116,8 @@ export default function ChatComponent({ conversationId }: { conversationId: stri
                 <h2 className="font-semibold text-gray-900 dark:text-white">
                   {conversation.title}
                 </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {conversation.model_name} • {conversation.message_count || conversation.messages?.length || 0} messages
-                </p>
               </div>
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                clearSelection()
-                router.push('/')
-              }}
-              className="text-green-600 border-green-200 hover:bg-green-50"
-            >
-              New Chat
-            </Button>
           </div>
         </div>
 
