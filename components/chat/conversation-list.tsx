@@ -10,8 +10,8 @@ import {
   MoreHorizontal, 
   Trash2, 
   Edit, 
-  Bot,
-  Loader2
+  Loader2,
+  Sparkle
 } from 'lucide-react'
 import { 
   DropdownMenu, 
@@ -125,7 +125,7 @@ export function ConversationList({
           ) : conversations?.length === 0 ? (
             
             <div className="text-center py-8 px-4">
-              <Bot className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+              <Sparkle className="w-12 h-12 mx-auto mb-2 text-gray-400" />
               <p className="text-gray-500 text-sm">No conversations yet</p>
               <p className="text-gray-400 text-xs mt-1">Start a new chat to begin</p>
             </div>

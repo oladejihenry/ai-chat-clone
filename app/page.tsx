@@ -127,7 +127,7 @@ export default function Home() {
           </div>
 
           <div className="space-y-3 mb-16">
-            <h1>Welcome to AI.chat, enter your question below to start chatting with AI models</h1>
+            <h1>Welcome to Zephfichat, enter your question below to start chatting with AI models</h1>
           </div>
 
           {!isAuthenticated && (

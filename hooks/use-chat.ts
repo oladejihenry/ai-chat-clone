@@ -11,6 +11,7 @@ import {
 } from '@/lib/api'
 import { toast } from 'sonner'
 import { useAuth } from './use-auth'
+import { useRouter } from 'next/navigation'
 
 export function useConversations() {
   const { isAuthenticated, user } = useAuth()
@@ -94,12 +95,14 @@ export function useSendMessage() {
       content,
       modelName,
       modelProvider,
+      files,
     }: {
       conversationId: string
       content: string
       modelName?: string
       modelProvider?: string
-    }) => sendMessage(conversationId, content, modelName, modelProvider),
+      files?: File[]
+    }) => sendMessage(conversationId, content, modelName, modelProvider, files),
     onMutate: async ({ conversationId, content }) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['conversation', conversationId] })
@@ -182,7 +185,7 @@ export function useSendMessage() {
 
 export function useDeleteConversation() {
   const queryClient = useQueryClient()
-  
+  const router = useRouter()
   return useMutation({
     mutationFn: async (conversationId: string) => {
       // Cancel and remove all queries for this conversation BEFORE making the API call
@@ -216,6 +219,7 @@ export function useDeleteConversation() {
       queryClient.removeQueries({ queryKey: ['conversation', conversationId] })
       queryClient.setQueryData(['conversation', conversationId], undefined)
       toast.success('Conversation deleted')
+      router.push('/')
     },
     onError: (error, _, context) => {
       // Revert the optimistic update

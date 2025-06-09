@@ -203,36 +203,53 @@ export async function sendMessage(
   conversationId: string,
   content: string,
   modelName?: string,
-  modelProvider?: string
+  modelProvider?: string,
+  files?: File[]
 ): Promise<{ user_message: Message; assistant_message: Message; usage?: Usage }> {
-  const requestBody: {
-    content: string
-    model_name?: string
-    model_provider?: string
-  } = { content }
+  await initializeCsrf()
+  
+  const headers: Record<string, string> = {
+    'Accept': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+  }
+  
+  const csrfToken = getCsrfToken()
+  if (csrfToken) {
+    headers['X-XSRF-TOKEN'] = csrfToken
+  }
+
+  // Use FormData for file uploads
+  const formData = new FormData()
+  formData.append('content', content)
   
   // Include model information if provided
   if (modelName && modelProvider) {
-    requestBody.model_name = modelName
-    requestBody.model_provider = modelProvider
+    formData.append('model_name', modelName)
+    formData.append('model_provider', modelProvider)
+  }
+
+  // Add files to FormData
+  if (files && files.length > 0) {
+    files.forEach((file, index) => {
+      formData.append(`files[${index}]`, file)
+    })
   }
   
-  const response = await apiRequest<{ 
-    message: string; 
-    data: { 
-      user_message: Message; 
-      assistant_message: Message; 
-      usage?: Usage 
-    } 
-  }>(
-    `/api/conversations/${conversationId}/messages`,
-    {
-      method: 'POST',
-      body: JSON.stringify(requestBody),
-    }
-  )
+  const response = await fetch(`${API_BASE_URL}/api/conversations/${conversationId}/messages`, {
+    method: 'POST',
+    credentials: 'include',
+    headers,
+    body: formData, // Use FormData instead of JSON
+  })
   
-  return response.data
+  if (!response.ok) {
+    const errorData = await response.text()
+    console.error('API request failed:', response.status, response.statusText, errorData)
+    throw new Error(`API request failed: ${response.status} ${response.statusText}`)
+  }
+  
+  const result = await response.json()
+  return result.data
 }
 
 export async function deleteConversation(id: string): Promise<void> {

@@ -27,7 +27,7 @@ export default function Mobile() {
                     <div className="w-6 h-6 bg-green-600 rounded flex items-center justify-center">
                       <span className="text-white text-sm font-bold">AI</span>
                     </div>
-                    <span className="font-semibold text-green-900 dark:text-white">AI.chat</span>
+                    <span className="font-semibold text-green-900 dark:text-white">Zephfi.chat</span>
                   </div>
                 </div>
                 <Button
@@ -52,7 +52,7 @@ export default function Mobile() {
                 <div className="w-6 h-6 bg-green-600 rounded flex items-center justify-center">
                   <span className="text-white text-sm font-bold">AI</span>
                 </div>
-                <span className="font-semibold text-green-900 dark:text-white">AI.chat</span>
+                <span className="font-semibold text-green-900 dark:text-white">Zephfichat</span>
               </div>
             </div>
             <Button

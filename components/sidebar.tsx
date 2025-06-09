@@ -174,9 +174,9 @@ export function SidebarComponent() {
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                 <div className="w-6 h-6 bg-green-600 rounded flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">AI</span>
+                    <span className="text-white text-sm font-bold">ZC</span>
                 </div>
-                <span className="font-semibold text-green-900 dark:text-white">AI.chat</span>
+                <span className="font-semibold text-green-900 dark:text-white">Zephfichat</span>
                 </div>
                 <Button
                 variant="ghost"
@@ -343,7 +343,7 @@ export function SidebarComponent() {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-green-200 dark:border-slate-800">
                             <DialogHeader>
-                                <DialogTitle className="text-green-900 dark:text-green-100">Login to AI.chat</DialogTitle>
+                                <DialogTitle className="text-green-900 dark:text-green-100">Login to Zephfichat</DialogTitle>
                             </DialogHeader>
                             <GoogleLogin />
                         </DialogContent>

@@ -1,14 +1,14 @@
 "use client"
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Bot } from 'lucide-react'
+import { Sparkle } from 'lucide-react'
 
 export function TypingIndicator() {
   return (
     <div className="flex gap-4">
       <Avatar className="w-8 h-8 mt-1">
         <AvatarFallback className="bg-blue-100 text-blue-700">
-          <Bot className="w-4 h-4" />
+          <Sparkle className="w-4 h-4" />
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">
