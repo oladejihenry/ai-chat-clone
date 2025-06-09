@@ -13,8 +13,8 @@ import Mobile from "@/components/mobile";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Chat",
-  description: "AI Chat",
+  title: "Zephfi Chat",
+  description: "Amazing AI Chat with Multi-AI Models Support",
 };
 
 export default function RootLayout({
