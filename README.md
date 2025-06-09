@@ -291,11 +291,10 @@ vercel --prod
 
 ### Backend (Laravel Forge/DigitalOcean)
 
-1. Set up your server with PHP 8.2+, MySQL, and Nginx
+1. Set up your server with PHP 8.2+, PostgreSQL, and Nginx
 2. Configure environment variables
 3. Run migrations: `php artisan migrate --force`
-4. Set up queue workers: `php artisan queue:work`
-5. Configure SSL certificate
+4. Configure SSL certificate
 
 ## 📖 Usage
 
@@ -304,10 +303,6 @@ vercel --prod
 3. **Switch Models** - Use the dropdown in the message input to select different AI models
 4. **Manage Conversations** - Search, rename, or delete conversations from the sidebar
 5. **Organized History** - Conversations are automatically grouped by date (Today, Yesterday, etc.)
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Workflow
 
