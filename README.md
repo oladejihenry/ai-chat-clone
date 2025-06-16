@@ -2,7 +2,7 @@
 
 A modern, multi-model AI chat platform built with **Next.js 15**, **Laravel**, and **TypeScript**. Chat with multiple AI models in a beautiful, responsive interface with conversation history, real-time typing indicators, and seamless model switching.
 
-![Zephfichat Demo](https://via.placeholder.com/800x400/10B981/FFFFFF?text=Zephfichat+-+Multi-AI+Chat+Platform)
+![Zephfichat Demo](https://youtu.be/b6oltw1ICSI)
 
 ## ✨ Features
 
@@ -47,8 +47,8 @@ A modern, multi-model AI chat platform built with **Next.js 15**, **Laravel**, a
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/zephfichat.git
-cd zephfichat
+git clone https://github.com/oladejihenry/ai-chat-clone.git
+cd ai-chat-clone
 
 # Install dependencies
 pnpm install
@@ -66,8 +66,9 @@ pnpm dev
 ### Backend Installation
 
 ```bash
-# Navigate to backend directory
-cd backend
+# clone the repository
+git clone https://github.com/oladejihenry/ai-chat-api.git
+cd ai-chat-api
 
 # Install PHP dependencies
 composer install

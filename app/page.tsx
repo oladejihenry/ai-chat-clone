@@ -56,15 +56,6 @@ export default function Home() {
                 </h2>
               </div>
             </div>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => clearSelection()}
-              className="text-green-600 border-green-200 hover:bg-green-50"
-            >
-              New Chat
-            </Button>
           </div>
         </div>
 

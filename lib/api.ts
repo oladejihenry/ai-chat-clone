@@ -199,17 +199,20 @@ export async function getConversation(id: string): Promise<Conversation> {
   return response.data
 }
 
+// Add this new function for streaming with real-time updates
 export async function sendMessage(
   conversationId: string,
   content: string,
   modelName?: string,
   modelProvider?: string,
-  files?: File[]
-): Promise<{ user_message: Message; assistant_message: Message; usage?: Usage }> {
+  files?: File[],
+  onChunk?: (chunk: string) => void,
+  onComplete?: (userMessage: Message, assistantMessage: Message) => void
+): Promise<{ user_message: Message; assistant_message: Message }> {
   await initializeCsrf()
   
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    'Accept': 'text/event-stream',
     'X-Requested-With': 'XMLHttpRequest',
   }
   
@@ -218,17 +221,14 @@ export async function sendMessage(
     headers['X-XSRF-TOKEN'] = csrfToken
   }
 
-  // Use FormData for file uploads
   const formData = new FormData()
   formData.append('content', content)
   
-  // Include model information if provided
   if (modelName && modelProvider) {
     formData.append('model_name', modelName)
     formData.append('model_provider', modelProvider)
   }
 
-  // Add files to FormData
   if (files && files.length > 0) {
     files.forEach((file, index) => {
       formData.append(`files[${index}]`, file)
@@ -239,17 +239,77 @@ export async function sendMessage(
     method: 'POST',
     credentials: 'include',
     headers,
-    body: formData, // Use FormData instead of JSON
+    body: formData,
   })
   
   if (!response.ok) {
     const errorData = await response.text()
-    console.error('API request failed:', response.status, response.statusText, errorData)
     throw new Error(`API request failed: ${response.status} ${response.statusText}`)
   }
   
-  const result = await response.json()
-  return result.data
+  return new Promise((resolve, reject) => {
+    const reader = response.body?.getReader()
+    const decoder = new TextDecoder()
+    let userMessage: Message | null = null
+    let assistantMessage: Message | null = null
+    
+    if (!reader) {
+      reject(new Error('No response body reader available'))
+      return
+    }
+
+    function readStream() {
+      reader?.read().then(({ done, value }) => {
+        if (done) {
+          if (userMessage && assistantMessage) {
+            onComplete?.(userMessage, assistantMessage)
+            resolve({ user_message: userMessage, assistant_message: assistantMessage })
+          } else {
+            reject(new Error('Stream completed without receiving both messages'))
+          }
+          return
+        }
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
+        
+        for (const line of lines) {
+          if (line.startsWith('event: ')) {
+            const event = line.slice(7)
+            continue
+          }
+          
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              
+              if (data.error) {
+                reject(new Error(data.error))
+                return
+              }
+              
+              // Handle streaming chunks
+              if (data.content && onChunk) {
+                onChunk(data.content)
+              }
+              
+              // Handle completion event with both messages
+              if (data.message && data.user_message) {
+                userMessage = data.user_message
+                assistantMessage = data.message
+              }
+            } catch (e) {
+              // Ignore non-JSON lines
+            }
+          }
+        }
+        
+        readStream()
+      }).catch(reject)
+    }
+    
+    readStream()
+  })
 }
 
 export async function deleteConversation(id: string): Promise<void> {
