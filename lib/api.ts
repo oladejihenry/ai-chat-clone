@@ -244,6 +244,7 @@ export async function sendMessage(
   
   if (!response.ok) {
     const errorData = await response.text()
+    console.log('Error data:', errorData)
     throw new Error(`API request failed: ${response.status} ${response.statusText}`)
   }
   
@@ -276,6 +277,7 @@ export async function sendMessage(
         for (const line of lines) {
           if (line.startsWith('event: ')) {
             const event = line.slice(7)
+            console.log('Event:', event)
             continue
           }
           
@@ -300,6 +302,7 @@ export async function sendMessage(
               }
             } catch (e) {
               // Ignore non-JSON lines
+              console.log('Error parsing JSON:', e)
             }
           }
         }
