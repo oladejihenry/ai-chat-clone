@@ -1,9 +1,7 @@
 "use client"
 import {
   ChevronDown,
-  Paperclip,
   X,
-  Globe,
   ArrowUp,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -20,7 +18,6 @@ import { toast } from "sonner"
 export function Footer() {
   const [message, setMessage] = React.useState("")
   const [selectedModel, setSelectedModel] = React.useState(aiModels[0])
-  const [internetSearch, setInternetSearch] = React.useState(false)
   const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([])
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const { isAuthenticated } = useAuth()
@@ -264,38 +261,6 @@ export function Footer() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={!isAuthenticated}
-                  className={`h-8 w-8 p-0 ${internetSearch ? "bg-green-600 text-white hover:bg-green-700" : "text-green-800 dark:text-white hover:bg-green-100/20 dark:hover:bg-slate-700"}`}
-                  onClick={() => setInternetSearch(!internetSearch)}
-                >
-                  <Globe className="w-4 h-4" />
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={!isAuthenticated}
-                  className={`relative h-8 w-8 p-0 hover:bg-green-100/20 dark:hover:bg-slate-700 ${
-                    uploadedFiles.length > 0 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : 'text-green-800 dark:text-white'
-                  }`}
-                  onClick={() => fileInputRef.current?.click()}
-                  title={`Upload files (${uploadedFiles.length} selected)`}
-                >
-                  <Paperclip className="w-4 h-4" />
-                  {uploadedFiles.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                      {uploadedFiles.length}
-                    </span>
-                  )}
-                </Button>
-              </div>
             </div>
 
             {/* Send button */}
@@ -313,12 +278,7 @@ export function Footer() {
             </Button>
           </div>
 
-          {internetSearch && (
-            <div className="flex items-center gap-2 mt-2 text-sm text-green-600 dark:text-green-400">
-              <Globe className="w-4 h-4" />
-              <span>Internet search enabled</span>
-            </div>
-          )}
+
 
           {!isAuthenticated && (
             <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
